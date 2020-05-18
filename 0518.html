@@ -2,11 +2,108 @@
 <html>
 <head>
   <style>
-    
+    body {
+      text-align: center;
+      padding: 10% 20% 0;
+      font-size: 1.5rem;
+    }
+    #formula {
+      display: inline-block;
+    }
+    #answer {
+      font-size: 1.5rem;
+      width: 3em;
+    }
+    button {
+      font-size: 1.2rem;
+    }
+    .is-hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <p id="formula"></p><input type="text" id="answer">
+  <div id="btnArea">
+    <button type="button" class="button" id="answerBtn">解答</button>
+    <button type="button" class="button is-hidden" id="nextBtn">次の問題</button>
+    <button type="button" class="button is-hidden" id="againBtn">再挑戦！</button>
+  </div>
+  <p>三回連続で正解してください</p>
+  <div id="imgArea"></div>
   <script>
+    let leftNumber = null;
+    let rightNumber = null;
+
+    const createNum = () => {
+      leftNumber = Math.floor(Math.random()*8)+1;
+      rightNumber = Math.floor(Math.random()*8)+1;
+
+      let formula = document.getElementById('formula');
+      formula.innerHTML = leftNumber + '+' + rightNumber + '=';
+    };
+
+    const selectImg = (imgName) => {
+      let img = document.createElement('img');
+      img.setAttribute('src', 'img/' + imgName +'.png');
+      return img;
+    };
+
+    const checkNum = (val) => {
+      return /\d/.test(val);
+    };
+
+    const imgArea = document.getElementById('imgArea');
+    const answerBtn = document.getElementById('answerBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const againBtn = document.getElementById('againBtn');
+    const hidden = 'is-hidden';
+    let i = 0;
+
+    createNum();
+
+    answerBtn.addEventListener('click', (event) => {
+      let answer = document.getElementById('answer');
+      let isNumber = checkNum(answer.value);
+      if (isNumber) {
+      let answerNum = Number(answer.value);
+      let correctNum = leftNumber + rightNumber;
+        switch(answerNum === correctNum) {
+          case true:
+            i ++;
+            if(i > 2) {
+              imgArea.appendChild(selectImg('congrats'));
+              answerBtn.classList.add(hidden);
+              againBtn.classList.remove(hidden);
+            } else {
+              imgArea.appendChild(selectImg('correct'));
+              answerBtn.classList.add(hidden);
+              nextBtn.classList.remove(hidden);
+            }
+          break;
+          case false:
+            imgArea.appendChild(selectImg('fault'));
+            answerBtn.classList.add(hidden);
+            againBtn.classList.remove(hidden);
+          break;
+        }
+      } else {
+        alert('数字を入力してください');
+        location.reload();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      answerBtn.classList.remove(hidden);
+      nextBtn.classList.add(hidden);
+      createNum();
+      document.getElementById('answer').value = '';
+      imgArea.firstChild.remove();
+    });
+
+    againBtn.addEventListener('click', () => {
+      location.reload();
+    });
 
   </script>
 </body>
